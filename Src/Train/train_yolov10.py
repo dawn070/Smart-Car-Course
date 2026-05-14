@@ -3,6 +3,8 @@ import os
 import glob
 import random
 
+random.seed(42)
+
 def main():
     base_dir = r"C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj"
     yaml_path = os.path.join(base_dir, "Src", "Train", "kitti.yaml")
@@ -35,7 +37,7 @@ def main():
     
     print("\n=== 3. 模型训练完成 ===")
     print("模型已自动在验证集上计算 mAP@0.5。")
-    print(f"Loss曲线 (results.png) 和 PR曲线 均已自动保存在: {os.path.join(project_dir, 'yolov10_kitti')} 目录下。")
+    print(f"Loss曲线 (results.png) 和 PR曲线 均已自动保存在: {os.path.join(project_dir, 'yolov10_kitti_baseline')} 目录下。")
     
     print("\n=== 4. 开始提取 6 张图片进行检测可视化 ===")
     
@@ -44,7 +46,7 @@ def main():
     
     # 防止找不到报错，做一个检查
     if not os.path.exists(best_weights):
-        best_weights = os.path.join(project_dir, "yolov10_kitti", "weights", "best.pt")
+        best_weights = os.path.join(project_dir, "yolov10_kitti_baseline", "weights", "best.pt")
 
     best_model = YOLO(best_weights)
     
