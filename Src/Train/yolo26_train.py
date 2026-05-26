@@ -9,9 +9,8 @@ from pathlib import Path
 
 from train_log_utils import (
 	append_training_log,
-	capture_val_output,
 	collect_dataset_info,
-	extract_metrics_table,
+	write_test_results_csv,
 )
 
 from plot_training_curves import plot_2x2_from_results_csv
@@ -215,16 +214,23 @@ def main():
 		)
 
 	best_model = YOLO(best_weights)
-	val_stdout = ""
-	metrics_table = ""
+	test_results_csv = None
 	if args.eval_test:
 		print("\n=== 4.1 使用测试集评估模型性能 ===")
-		val_stdout = capture_val_output(
-			best_model.val,
+		metrics = best_model.val(
 			data=yaml_rel_path,
 			split="test",
+			project=project_dir,
+			name=os.path.join(run_name, "test_eval"),
+			exist_ok=True,
 		)
-		metrics_table = extract_metrics_table(val_stdout)
+		test_results_csv = Path(project_dir) / run_name / "test_eval" / "results.csv"
+		write_test_results_csv(
+			results_csv=test_results_csv,
+			metrics=metrics,
+			total_images=dataset_info.counts_test.images,
+			total_instances=dataset_info.counts_test.instances,
+		)
 
 	val_images_dir_for_predict = str(dataset_info.val_images_dir)
 	all_val_imgs = glob.glob(os.path.join(val_images_dir_for_predict, "*.png")) + glob.glob(
@@ -260,8 +266,7 @@ def main():
 		run_name=run_name,
 		best_weights=best_weights,
 		eval_test_enabled=bool(args.eval_test),
-		test_metrics_table=metrics_table,
-		test_raw_output=val_stdout,
+		test_results_csv=test_results_csv,
 	)
 
 

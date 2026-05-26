@@ -19,6 +19,29 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 
+def configure_matplotlib_chinese_font() -> None:
+    """Configure Matplotlib to render Chinese characters.
+
+    On Windows, Microsoft YaHei is usually available. We provide a fallback list.
+    """
+
+    try:
+        import matplotlib
+
+        matplotlib.rcParams["font.sans-serif"] = [
+            "Microsoft YaHei",
+            "SimHei",
+            "SimSun",
+            "Noto Sans CJK SC",
+            "Arial Unicode MS",
+            "DejaVu Sans",
+        ]
+        matplotlib.rcParams["axes.unicode_minus"] = False
+    except Exception:
+        # If matplotlib isn't available or config fails, skip silently.
+        pass
+
+
 def _build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Plot 2x2 training curves from results.csv")
     parser.add_argument(
@@ -157,6 +180,8 @@ def plot_2x2_from_results_csv(
     title: str = "",
 ) -> None:
     """Plot a 2x2 figure from an Ultralytics results.csv."""
+
+    configure_matplotlib_chinese_font()
 
     epochs, series = _read_results_csv(results_csv)
     cols = list(series.keys())

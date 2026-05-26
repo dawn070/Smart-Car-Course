@@ -11,7 +11,9 @@ from dataclasses import dataclass
 from datetime import datetime
 import io
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, List
+import re
+import csv
 
 try:
     import yaml  # type: ignore
@@ -143,37 +145,207 @@ def capture_val_output(fn, *args, **kwargs) -> str:
     return buf.getvalue()
 
 
-def extract_metrics_table(text: str) -> str:
-    """Extract the Class/Images/Instances/mAP table block from Ultralytics output."""
+def write_test_results_csv(
+    *,
+    results_csv: Path,
+    metrics: Any,
+    total_images: int,
+    total_instances: int,
+) -> None:
+    """Write a stable CSV for test metrics so logs can read it reliably.
 
-    lines = text.splitlines()
-    start = None
-    for i, line in enumerate(lines):
-        if "Class" in line and "Images" in line and "Instances" in line and "mAP" in line:
-            start = i
-            break
-    if start is None:
+    The CSV schema is independent from Ultralytics internal files.
+    """
+
+    # class names
+    names = getattr(metrics, "names", None)
+    if isinstance(names, dict):
+        class_names = [names[i] for i in sorted(names.keys())]
+    elif isinstance(names, (list, tuple)):
+        class_names = list(names)
+    else:
+        # fallback
+        nc = int(getattr(getattr(metrics, "box", None), "nc", 0) or 0)
+        class_names = [f"class{i}" for i in range(nc)]
+
+    nc = len(class_names)
+
+    # per-class counts (Ultralytics already computes these during val)
+    nt_per_class = getattr(metrics, "nt_per_class", None)
+    nt_per_image = getattr(metrics, "nt_per_image", None)
+
+    def _get_count(arr, i: int) -> int:
+        try:
+            return int(arr[i])
+        except Exception:
+            return 0
+
+    # metrics accessors
+    def _mean_results() -> Tuple[float, float, float, float]:
+        mr = getattr(metrics, "mean_results", None)
+        if mr is None:
+            mr = getattr(getattr(metrics, "box", None), "mean_results", None)
+        if callable(mr):
+            mr = mr()
+        if isinstance(mr, (list, tuple)) and len(mr) >= 4:
+            return float(mr[0]), float(mr[1]), float(mr[2]), float(mr[3])
+        return 0.0, 0.0, 0.0, 0.0
+
+    def _class_result(i: int) -> Tuple[float, float, float, float]:
+        cr = getattr(metrics, "class_result", None)
+        if callable(cr):
+            r = cr(i)
+            if isinstance(r, (list, tuple)) and len(r) >= 4:
+                return float(r[0]), float(r[1]), float(r[2]), float(r[3])
+        return 0.0, 0.0, 0.0, 0.0
+
+    results_csv.parent.mkdir(parents=True, exist_ok=True)
+    with results_csv.open("w", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["Class", "Images", "Instances", "Box(P)", "R", "mAP50", "mAP50-95"])
+
+        mp, mr, map50, map5095 = _mean_results()
+        w.writerow([
+            "all",
+            int(total_images),
+            int(total_instances),
+            mp,
+            mr,
+            map50,
+            map5095,
+        ])
+
+        for i, name in enumerate(class_names):
+            p, r, ap50, ap = _class_result(i)
+            w.writerow(
+                [
+                    name,
+                    _get_count(nt_per_image, i) if nt_per_image is not None else 0,
+                    _get_count(nt_per_class, i) if nt_per_class is not None else 0,
+                    p,
+                    r,
+                    ap50,
+                    ap,
+                ]
+            )
+
+
+def format_metrics_table_from_results_csv(results_csv: Path) -> str:
+    """Read the stable CSV produced by write_test_results_csv() and format a neat table."""
+
+    rows: List[Dict[str, str]] = []
+    with results_csv.open("r", encoding="utf-8", errors="ignore", newline="") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row.get("Class"):
+                rows.append(row)
+
+    if not rows:
         return ""
 
-    collected = []
-    for line in lines[start:]:
-        if not line.strip() and collected:
-            break
-        if line.lstrip().startswith("Speed:"):
-            break
-        if "Results saved to" in line:
-            break
-        collected.append(line.rstrip())
+    def f_int(s: str) -> int:
+        try:
+            return int(float(s))
+        except Exception:
+            return 0
 
-    return "\n".join(collected).rstrip()
+    def f_float(s: str) -> float:
+        try:
+            return float(s)
+        except Exception:
+            return 0.0
+
+    def fmt_float_stripped(value: float, width: int = 11, decimals: int = 3) -> str:
+        s = f"{value:.{decimals}f}"
+        # strip trailing zeros to mimic Ultralytics console style (e.g. 0.730 -> 0.73)
+        s = s.rstrip("0").rstrip(".")
+        return s.rjust(width)
+
+    # Match Ultralytics column widths: %22s + %11s*6
+    class_w = max(22, max(len(r["Class"]) for r in rows))
+    img_w = 11
+    inst_w = 11
+    p_w = 11
+    r_w = 11
+    map50_w = 11
+    map5095_w = 11
+
+    header = (
+        f"{'Class':>{class_w}}"
+        f"{'Images':>{img_w}}"
+        f"{'Instances':>{inst_w}}"
+        f"{'Box(P':>{p_w}}"
+        f"{'R':>{r_w}}"
+        f"{'mAP50':>{map50_w}}"
+        f"{'mAP50-95)':>{map5095_w}}"
+    )
+
+    out_lines = [header]
+    for r in rows:
+        out_lines.append(
+            f"{r['Class']:>{class_w}}"
+            f"{f_int(r.get('Images', '0')):>{img_w}}"
+            f"{f_int(r.get('Instances', '0')):>{inst_w}}"
+            f"{fmt_float_stripped(f_float(r.get('Box(P)', '0')), width=p_w)}"
+            f"{fmt_float_stripped(f_float(r.get('R', '0')), width=r_w)}"
+            f"{fmt_float_stripped(f_float(r.get('mAP50', '0')), width=map50_w)}"
+            f"{fmt_float_stripped(f_float(r.get('mAP50-95', '0')), width=map5095_w)}"
+        )
+
+    return "\n".join(out_lines).rstrip()
 
 
-def _format_kv_block(title: str, items: Dict[str, Any]) -> str:
-    keys = sorted(items.keys())
-    max_k = max((len(k) for k in keys), default=0)
+def _strip_ansi(text: str) -> str:
+    return re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", text)
+
+
+def extract_metrics_table(text: str) -> str:
+    """Extract the final Class/Images/Instances/mAP table block from Ultralytics output."""
+
+    raw_lines = text.splitlines()
+    lines = [_strip_ansi(line) for line in raw_lines]
+
+    header_indices: List[int] = []
+    for i, line in enumerate(lines):
+        if "Class" in line and "Images" in line and "Instances" in line and "mAP" in line:
+            header_indices.append(i)
+
+    def is_progress(line: str) -> bool:
+        return "%" in line or "it/s" in line or "s/it" in line
+
+    blocks: List[str] = []
+    for start in header_indices:
+        header = lines[start].rstrip()
+        # remove progress suffix if present
+        if ")" in header and is_progress(header):
+            header = header.split(")", 1)[0] + ")"
+
+        collected = [header]
+        for line in lines[start + 1 :]:
+            if not line.strip() and len(collected) > 1:
+                break
+            if line.lstrip().startswith("Speed:"):
+                break
+            if "Results saved to" in line:
+                break
+            if is_progress(line):
+                continue
+            if "Class" in line and "Images" in line and "Instances" in line and "mAP" in line:
+                break
+            collected.append(line.rstrip())
+
+        # keep only blocks with data rows
+        if len(collected) > 1:
+            blocks.append("\n".join(collected).rstrip())
+
+    return blocks[-1] if blocks else ""
+
+
+def _format_kv_block(title: str, items: List[Tuple[str, Any]]) -> str:
+    max_k = max((len(k) for k, _ in items), default=0)
     lines = [f"{title}:"]
-    for k in keys:
-        lines.append(f"  {k.ljust(max_k)} : {items[k]}")
+    for k, v in items:
+        lines.append(f"  {k.ljust(max_k)} :  {v}")
     return "\n".join(lines)
 
 
@@ -188,22 +360,21 @@ def append_training_log(
     run_name: str,
     best_weights: str,
     eval_test_enabled: bool,
-    test_metrics_table: str,
-    test_raw_output: str,
+    test_results_csv: Optional[Path],
 ) -> None:
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
     sep = "=" * 92
-    meta = {
-        "start_time": start_time.strftime("%Y-%m-%d %H:%M:%S"),
-        "end_time": end_time.strftime("%Y-%m-%d %H:%M:%S"),
-        "duration": str(end_time - start_time),
-        "dataset_yaml": str(dataset.yaml_abs_path),
-        "dataset_root": str(dataset.dataset_root),
-        "project_dir": str(project_dir),
-        "run_name": str(run_name),
-        "best_weights": str(best_weights),
-    }
+    meta_items = [
+        ("start_time", start_time.strftime("%Y-%m-%d %H:%M:%S")),
+        ("duration", str(end_time - start_time)),
+        ("end_time", end_time.strftime("%Y-%m-%d %H:%M:%S")),
+        ("dataset_yaml", str(dataset.yaml_abs_path)),
+        ("dataset_root", str(dataset.dataset_root)),
+        ("project_dir", str(project_dir)),
+        ("run_name", str(run_name)),
+        ("best_weights", str(best_weights)),
+    ]
 
     counts_lines = [
         "Split Counts:",
@@ -215,18 +386,20 @@ def append_training_log(
     if not eval_test_enabled:
         metrics_block = "Test Metrics: (skipped)"
     else:
-        if test_metrics_table:
-            metrics_block = "Test Metrics:\n" + test_metrics_table
+        if test_results_csv and test_results_csv.exists():
+            table = format_metrics_table_from_results_csv(test_results_csv)
+            metrics_block = "Test Metrics:\n" + table if table else "Test Metrics: (empty results.csv)"
         else:
-            tail = "\n".join(test_raw_output.splitlines()[-80:]).rstrip()
-            metrics_block = "Test Metrics: (raw output tail)\n" + tail
+            metrics_block = "Test Metrics: (results.csv not found)"
+
+    args_items = [(k, str(v)) for k, v in sorted(args.items())]
 
     content = "\n".join(
         [
             sep,
-            _format_kv_block("Run Meta", meta),
+            _format_kv_block("Run Meta", meta_items),
             "\n".join(counts_lines),
-            _format_kv_block("Hyperparameters", {k: str(v) for k, v in args.items()}),
+            _format_kv_block("Hyperparameters", args_items),
             metrics_block,
             sep,
             "",
