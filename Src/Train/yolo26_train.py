@@ -14,6 +14,8 @@ from train_log_utils import (
 	extract_metrics_table,
 )
 
+from plot_training_curves import plot_2x2_from_results_csv
+
 
 random.seed(42)
 
@@ -118,6 +120,24 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 		dest="eval_test",
 		help="关闭测试集评估",
 	)
+	parser.add_argument(
+		"--plot-curves",
+		action="store_true",
+		default=True,
+		help="训练结束后自动绘制 2x2 曲线图",
+	)
+	parser.add_argument(
+		"--no-plot-curves",
+		action="store_false",
+		dest="plot_curves",
+		help="关闭训练曲线绘图",
+	)
+	parser.add_argument(
+		"--plot-dpi",
+		type=int,
+		default=150,
+		help="曲线图输出 DPI",
+	)
 	return parser
 
 
@@ -168,6 +188,24 @@ def main():
 	print(
 		f"Loss/指标曲线 (results.png) 等已保存在: {os.path.join(project_dir, run_name)} 目录下。"
 	)
+
+	if args.plot_curves:
+		run_dir = Path(project_dir) / run_name
+		results_csv = run_dir / "results.csv"
+		out_png = run_dir / "curves_2x2.png"
+		try:
+			if results_csv.exists():
+				plot_2x2_from_results_csv(
+					results_csv=results_csv,
+					out_path=out_png,
+					dpi=int(args.plot_dpi),
+					show=False,
+					title=f"Training Curves: {run_dir.as_posix()}",
+				)
+			else:
+				print(f"[提示] 未找到 results.csv，跳过绘图: {results_csv}")
+		except Exception as e:
+			print(f"[提示] 绘图失败（不影响训练结果）：{e}")
 
 	print("\n=== 4. 抽取验证集图片进行检测可视化 ===")
 	best_weights = _find_latest_best_weight(project_dir, run_name)
