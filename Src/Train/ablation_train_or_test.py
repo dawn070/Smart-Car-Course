@@ -58,6 +58,8 @@ def _apply_arch_ablation(
     run_name: str,
     psa: Optional[bool],
     scdown: Optional[bool],
+    scdown_maxpool: Optional[bool],
+    c2fcib_lk: Optional[bool],
     replace_neck: bool,
     neck_yaml_path: Optional[str],
 ) -> str:
@@ -108,6 +110,59 @@ def _apply_arch_ablation(
         else:
             pass
 
+    if scdown_maxpool:
+        # 将 SCDown 替换为 MaxPool 下采样（保持 stride=2）。
+        # 使用 nn.MaxPool2d，args: [k, s] 或 [k, s, p]
+        replaced = 0
+        for section in ("backbone", "head"):
+            layers = cfg.get(section)
+            if not isinstance(layers, list):
+                continue
+            for i, layer in enumerate(layers):
+                if isinstance(layer, list) and len(layer) >= 4 and layer[2] == "SCDown":
+                    old_args = layer[3] if isinstance(layer[3], list) else []
+                    # SCDown args 通常为 [c2, k, s]，这里保持 k/s，并补齐 padding
+                    # 经验上 k=3,s=2,p=1 可避免多尺度特征 concat 时出现 14/15 这种对不齐
+                    k = old_args[1] if len(old_args) >= 2 else 3
+                    s = old_args[2] if len(old_args) >= 3 else 2
+                    p = (k // 2) if isinstance(k, int) and (k % 2 == 1) else 0
+                    layer[2] = "nn.MaxPool2d"
+                    layer[3] = [k, s, p]
+                    layers[i] = layer
+                    replaced += 1
+
+        if replaced == 0:
+            print("[警告] 未在 backbone/head 的层列表中找到 SCDown，无法替换为 MaxPool。")
+        else:
+            print(f"[结构消融] SCDown -> MaxPool：已替换 {replaced} 个 SCDown 层（保持索引不变）。")
+
+    if c2fcib_lk is not None:
+        # C2fCIB args 通常为 [c2, shortcut, lk]
+        updated = 0
+        for section in ("backbone", "head"):
+            layers = cfg.get(section)
+            if not isinstance(layers, list):
+                continue
+            for i, layer in enumerate(layers):
+                if isinstance(layer, list) and len(layer) >= 4 and layer[2] == "C2fCIB":
+                    old_args = layer[3] if isinstance(layer[3], list) else []
+                    # 保持原参数数量与顺序
+                    if len(old_args) >= 3:
+                        old_args[2] = c2fcib_lk
+                    elif len(old_args) == 2:
+                        old_args.append(c2fcib_lk)
+                    elif len(old_args) == 1:
+                        old_args.extend([True, c2fcib_lk])
+                    else:
+                        old_args = [1024, True, c2fcib_lk]
+                    layer[3] = old_args
+                    layers[i] = layer
+                    updated += 1
+        if updated == 0:
+            print("[警告] 未在 backbone/head 的层列表中找到 C2fCIB，无法设置 lk 参数。")
+        else:
+            print(f"[结构配置] C2fCIB lk={'on' if c2fcib_lk else 'off'}：已更新 {updated} 个 C2fCIB 层参数。")
+
     # 可选替换 Neck 结构：将 neck_yaml 中的 neck/head 覆盖到当前模型
     if replace_neck:
         if not neck_yaml_path:
@@ -150,12 +205,66 @@ def _resolve_val_images_dir(data_yaml_path: str, base_dir: str) -> Optional[str]
         val_rel = data_cfg.get("val")
         if not root or not val_rel:
             return None
-        # data.yaml 的 path 是相对该文件所在目录的相对路径
-        yaml_dir = os.path.dirname(data_yaml_path)
-        root_abs = os.path.abspath(os.path.join(yaml_dir, root))
+        # 兼容两种写法：
+        # 1) path 相对 data.yaml 所在目录（Ultralytics 常见）
+        # 2) path 相对项目根目录（本项目的 kitti.yaml 目前就是这种写法）
+        if os.path.isabs(root):
+            root_abs = root
+        else:
+            yaml_dir = os.path.dirname(os.path.abspath(data_yaml_path))
+            cand1 = os.path.abspath(os.path.join(yaml_dir, root))
+            cand2 = os.path.abspath(os.path.join(base_dir, root))
+            root_abs = cand1 if os.path.exists(cand1) else (cand2 if os.path.exists(cand2) else cand1)
         return os.path.join(root_abs, val_rel)
     except Exception:
         return None
+
+
+def _collect_images_from_source(source_str: str, base_dir: str) -> list:
+    """解析推理图片来源：文件/目录/通配符/逗号分隔。返回绝对路径列表。"""
+    if not source_str:
+        return []
+
+    items = [s.strip() for s in source_str.split(",") if s.strip()]
+    results = []
+    exts = ("*.png", "*.jpg", "*.jpeg", "*.bmp")
+
+    for item in items:
+        # 相对路径统一按项目根目录解析
+        path = item
+        if not os.path.isabs(path):
+            path = os.path.abspath(os.path.join(base_dir, path))
+
+        # 通配符
+        if any(ch in path for ch in ["*", "?", "[", "]"]):
+            for ext_path in glob.glob(path):
+                if os.path.isfile(ext_path):
+                    results.append(os.path.abspath(ext_path))
+            continue
+
+        # 目录
+        if os.path.isdir(path):
+            for ext in exts:
+                results.extend(
+                    [
+                        os.path.abspath(p)
+                        for p in glob.glob(os.path.join(path, "**", ext), recursive=True)
+                    ]
+                )
+            continue
+
+        # 单文件
+        if os.path.isfile(path):
+            results.append(os.path.abspath(path))
+
+    # 去重并保持稳定顺序
+    seen = set()
+    uniq = []
+    for p in results:
+        if p not in seen:
+            seen.add(p)
+            uniq.append(p)
+    return uniq
 
 
 def main():
@@ -185,6 +294,18 @@ def main():
         action="store_true",
         help="将所有 SCDown 层替换为 Conv 下采样层（等价于 --scdown off，更直观）",
     )
+    parser.add_argument(
+        "--scdown_maxpool",
+        action="store_true",
+        help="将所有 SCDown 层替换为 MaxPool 下采样层",
+    )
+    parser.add_argument(
+        "--c2fcib_lk",
+        type=str,
+        choices=["on", "off"],
+        default=None,
+        help="设置 C2fCIB 的 lk 参数（大核卷积开关）",
+    )
     parser.add_argument("--replace_neck", action="store_true", help="是否替换 Neck 结构")
     parser.add_argument("--neck_yaml", type=str, default=None, help="Neck 结构 yaml 路径")
 
@@ -192,18 +313,82 @@ def main():
     parser.add_argument("--device", type=str, default="0", help="设备，如 0 或 cpu，默认自动检测")
     parser.add_argument("--workers", type=int, default=0, help="DataLoader workers（Windows 推荐 0）")
     parser.add_argument("--use_nms", type=str, choices=["on", "off"], default="off", help="是否启用 NMS（用于推理可视化）")
+    parser.add_argument("--skip_train", action="store_true", help="跳过训练，仅进行推理")
+    parser.add_argument("--weights", type=str, default=None, help="推理权重路径（best.pt/last.pt）")
+    parser.add_argument("--infer_source", type=str, default=None, help="推理图片/目录/通配符，或逗号分隔多个路径")
+    parser.add_argument("--infer_conf", type=float, default=0.25, help="推理置信度阈值")
+    parser.add_argument("--infer_iou", type=float, default=0.7, help="NMS 的 IoU 阈值（越小抑制越强）")
+    parser.add_argument("--infer_name", type=str, default=None, help="推理结果子目录名")
 
     args = parser.parse_args()
 
-    # 参数冲突校验：--scdown_conv 与 --scdown on/off 不应同时使用
+    # 参数冲突校验：--scdown_conv / --scdown_maxpool / --scdown on/off 不应同时使用
     if args.scdown_conv and args.scdown is not None:
         raise SystemExit("参数冲突：请不要同时使用 --scdown_conv 与 --scdown on/off。")
+    if args.scdown_maxpool and args.scdown is not None:
+        raise SystemExit("参数冲突：请不要同时使用 --scdown_maxpool 与 --scdown on/off。")
+    if args.scdown_conv and args.scdown_maxpool:
+        raise SystemExit("参数冲突：请不要同时使用 --scdown_conv 与 --scdown_maxpool。")
 
     base_dir = _base_dir()
     data_yaml = args.data_yaml or os.path.join(base_dir, "Src", "Train", "kitti.yaml")
     project_dir = os.path.join(base_dir, "runs", "ablation")
 
     run_name = args.run_name or f"ablation_{args.model}_{time.strftime('%Y%m%d_%H%M%S')}"
+
+    # 切换到项目根目录，避免 YOLO 底层对中文路径解析异常
+    os.chdir(base_dir)
+
+    if args.skip_train:
+        print("=== 跳过训练：直接推理 ===")
+
+        infer_weights = args.weights
+        if infer_weights:
+            infer_weights = os.path.abspath(infer_weights)
+        else:
+            infer_weights = _resolve_weights_or_model(args.model, base_dir)
+            print(f"[提示] 未提供 --weights，已回退到预训练权重: {infer_weights}")
+
+        if not os.path.exists(infer_weights):
+            raise SystemExit(f"未找到权重文件: {infer_weights}")
+
+        if not args.infer_source:
+            raise SystemExit("请提供 --infer_source 指定推理图片/目录/通配符。")
+
+        infer_imgs = _collect_images_from_source(args.infer_source, base_dir)
+        if not infer_imgs:
+            raise SystemExit("未找到可推理的图片，请检查 --infer_source。")
+
+        infer_name = args.infer_name or f"{run_name}_infer"
+        use_nms = args.use_nms == "on"
+        print("非极大值抑制（NMS）已启用。" if use_nms else "非极大值抑制（NMS）已禁用。")
+
+        model = YOLO(infer_weights)
+
+        t0 = time.perf_counter()
+        model.predict(
+            source=infer_imgs,
+            save=True,
+            conf=args.infer_conf,
+            iou=args.infer_iou,
+            nms=use_nms,
+            project=project_dir,
+            name=infer_name,
+        )
+        t1 = time.perf_counter()
+
+        avg_ms = (t1 - t0) / max(1, len(infer_imgs)) * 1000.0
+        speed_path = os.path.join(project_dir, infer_name, "infer_speed.txt")
+        with open(speed_path, "w", encoding="utf-8") as f:
+            f.write(f"sample_size: {len(infer_imgs)}\n")
+            f.write(f"total_seconds: {t1 - t0:.6f}\n")
+            f.write(f"avg_ms_per_image: {avg_ms:.3f}\n")
+            f.write(f"nms: {use_nms}\n")
+            f.write(f"iou: {args.infer_iou}\n")
+
+        print(f"\n[任务完成] 推理结果已保存在: {os.path.join(project_dir, infer_name)}")
+        print(f"推理速度已保存: {speed_path}")
+        return
 
     print("=== 1. 解析模型与结构消融配置 ===")
 
@@ -216,6 +401,7 @@ def main():
         scdown_flag = False
     else:
         scdown_flag = None if args.scdown is None else (args.scdown == "on")
+    c2fcib_lk_flag = None if args.c2fcib_lk is None else (args.c2fcib_lk == "on")
 
     if args.model_yaml:
         model_yaml_path = os.path.abspath(args.model_yaml)
@@ -225,6 +411,8 @@ def main():
             run_name,
             psa=psa_flag,
             scdown=scdown_flag,
+            scdown_maxpool=args.scdown_maxpool,
+            c2fcib_lk=c2fcib_lk_flag,
             replace_neck=args.replace_neck,
             neck_yaml_path=args.neck_yaml,
         )
@@ -232,13 +420,11 @@ def main():
     else:
         model_source = _resolve_weights_or_model(args.model, base_dir)
         print(f"预训练权重路径: {model_source} | exists={os.path.exists(model_source)}")
-        if psa_flag is not None or scdown_flag is not None or args.replace_neck:
+        if psa_flag is not None or scdown_flag is not None or args.scdown_maxpool or c2fcib_lk_flag is not None or args.replace_neck:
             print("[提示] 未提供 --model_yaml，结构消融开关将不生效。")
 
     print("=== 2. 加载模型并开始训练 ===")
 
-    # 切换到项目根目录，避免 YOLO 底层对中文路径解析异常
-    os.chdir(base_dir)
     model = YOLO(model_source)
 
     train_kwargs = dict(
@@ -281,21 +467,29 @@ def main():
 
     best_model = YOLO(best_weights)
 
-    val_images_dir = _resolve_val_images_dir(data_yaml, base_dir)
-    if not val_images_dir or not os.path.exists(val_images_dir):
-        print("[警告] 未找到验证集图像目录，跳过可视化。")
-        return
+    if args.infer_source:
+        sample_imgs = _collect_images_from_source(args.infer_source, base_dir)
+        if not sample_imgs:
+            print("[警告] 未找到推理图片，跳过可视化。")
+            return
+    else:
+        val_images_dir = _resolve_val_images_dir(data_yaml, base_dir)
+        if not val_images_dir or not os.path.exists(val_images_dir):
+            print("[警告] 未找到验证集图像目录，跳过可视化。")
+            return
 
-    all_val_imgs = []
-    for ext in ("*.png", "*.jpg", "*.jpeg"):
-        all_val_imgs.extend(glob.glob(os.path.join(val_images_dir, ext)))
+        all_val_imgs = []
+        for ext in ("*.png", "*.jpg", "*.jpeg"):
+            all_val_imgs.extend(glob.glob(os.path.join(val_images_dir, ext)))
 
-    if not all_val_imgs:
-        print("[警告] 验证集图像为空，跳过可视化。")
-        return
+        if not all_val_imgs:
+            print("[警告] 验证集图像为空，跳过可视化。")
+            return
 
-    sample_size = min(6, len(all_val_imgs))
-    sample_imgs = random.sample(all_val_imgs, sample_size)
+        sample_size = min(6, len(all_val_imgs))
+        sample_imgs = random.sample(all_val_imgs, sample_size)
+
+    sample_size = len(sample_imgs)
     use_nms = args.use_nms == "on"
 
     # 统计推理速度（平均每张图）
@@ -303,23 +497,26 @@ def main():
     best_model.predict(
         source=sample_imgs,
         save=True,
-        conf=0.25,
+        conf=args.infer_conf,
+        iou=args.infer_iou,
         nms=use_nms,
         project=project_dir,
-        name=f"{run_name}_predict_{sample_size}imgs",
+        name=args.infer_name or f"{run_name}_predict_{sample_size}imgs",
     )
     t1 = time.perf_counter()
 
     avg_ms = (t1 - t0) / max(1, sample_size) * 1000.0
+    infer_name = args.infer_name or f"{run_name}_predict_{sample_size}imgs"
     speed_path = os.path.join(project_dir, run_name, "infer_speed.txt")
     with open(speed_path, "w", encoding="utf-8") as f:
         f.write(f"sample_size: {sample_size}\n")
         f.write(f"total_seconds: {t1 - t0:.6f}\n")
         f.write(f"avg_ms_per_image: {avg_ms:.3f}\n")
         f.write(f"nms: {use_nms}\n")
+        f.write(f"iou: {args.infer_iou}\n")
 
     print(
-        f"\n[任务完成] 预测可视化图片已保存在: {os.path.join(project_dir, f'{run_name}_predict_{sample_size}imgs')}"
+        f"\n[任务完成] 预测可视化图片已保存在: {os.path.join(project_dir, infer_name)}"
     )
     print(f"推理速度已保存: {speed_path}")
 
