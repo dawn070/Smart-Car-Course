@@ -74,7 +74,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 		default="auto",
 		help="优化器：auto/SGD/Adam/AdamW/RMSProp...（不区分大小写）",
 	)
-	parser.add_argument("--device", type=str, default="", help="训练设备")
+	parser.add_argument("--device", type=str, default="cuda", help="训练设备")
 	parser.add_argument("--workers", type=int, default=0, help="DataLoader 进程数")
 	parser.add_argument("--conf", type=float, default=0.3, help="推理置信度阈值")
 	parser.add_argument(
