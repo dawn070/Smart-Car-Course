@@ -162,3 +162,36 @@ runs/
         ├── infer_speed.txt          # 推理速度统计
         └── ...
 ```
+
+---
+
+## 3. `rtdetr_train_kitti.py` — RT-DETR 预训练模型微调脚本
+
+**用途**：加载项目根目录的 `rtdetr-l.pt`（RT-DETR-L 预训练权重），在 KITTI（Pedestrian/Cyclist）上微调训练；训练结束后可选测试集评估，并从验证集抽样做可视化。
+
+### 使用方式
+
+建议在项目根目录运行（脚本内部会 `chdir` 到 `--base-dir`）：
+
+```bash
+cd <project_root>
+python Src/Train/rtdetr_train_kitti.py --weights rtdetr-l.pt --epochs 20 --imgsz 640 --batch 8
+```
+
+### 常用参数
+
+| 参数 | 说明 | 默认值 |
+|---|---|---|
+| `--weights` | 预训练权重路径（可相对项目根目录） | `rtdetr-l.pt` |
+| `--epochs` | 训练轮数 | 20 |
+| `--imgsz` | 输入尺寸 | 640 |
+| `--batch` | 批大小（RT-DETR-L 建议小一些） | 8 |
+| `--freeze` | 冻结前 N 层（0 不冻结） | 0 |
+| `--device` | 训练设备 | `cuda` |
+| `--eval-test` / `--no-eval-test` | 训练后是否跑测试集评估 | 开启 |
+
+### 输出位置
+
+- 训练输出：`runs/rtdetr_kitti_finetune/`（含 `weights/best.pt`、`results.csv` 等）
+- 测试集评估（若开启）：`runs/rtdetr_kitti_finetune/test_eval/`
+- 验证集抽样可视化：`runs/rtdetr_kitti_finetune/rtdetr_predict_imgs/`
