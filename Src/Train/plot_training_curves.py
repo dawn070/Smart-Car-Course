@@ -1,9 +1,9 @@
 """Plot training curves from Ultralytics results.csv.
 
 Creates a 2x2 figure:
-1) train/val box loss
+1) train/val box-like loss (YOLO: box_loss; RT-DETR: giou_loss)
 2) train/val cls loss
-3) train/val dfl loss
+3) train/val dfl-like loss (YOLO: dfl_loss; RT-DETR: l1_loss)
 4) learning rate curve
 
 Usage examples:
@@ -147,6 +147,25 @@ def _find_col(all_cols: List[str], candidates: List[str]) -> Optional[str]:
     return None
 
 
+def _pretty_loss_name(col: Optional[str], fallback: str) -> str:
+    if not col:
+        return fallback
+
+    mapping = {
+        "train/box_loss": "Box Loss",
+        "val/box_loss": "Box Loss",
+        "train/giou_loss": "GIoU Loss",
+        "val/giou_loss": "GIoU Loss",
+        "train/dfl_loss": "DFL Loss",
+        "val/dfl_loss": "DFL Loss",
+        "train/l1_loss": "L1 Loss",
+        "val/l1_loss": "L1 Loss",
+        "train/cls_loss": "Class Loss",
+        "val/cls_loss": "Class Loss",
+    }
+    return mapping.get(col, fallback)
+
+
 def _mean_lr(all_cols: List[str], series: Dict[str, List[float]]) -> Tuple[str, List[float]]:
     lr_cols = [c for c in all_cols if c.startswith("lr/")]
     if not lr_cols:
@@ -187,14 +206,16 @@ def plot_2x2_from_results_csv(
     cols = list(series.keys())
 
     # Resolve loss columns
-    train_box = _find_col(cols, ["train/box_loss", "train/box", "box_loss"])
-    val_box = _find_col(cols, ["val/box_loss", "val/box"])
+    # YOLO: box_loss/cls_loss/dfl_loss
+    # RT-DETR: giou_loss/cls_loss/l1_loss
+    train_box = _find_col(cols, ["train/box_loss", "train/box", "box_loss", "train/giou_loss", "train/giou"])
+    val_box = _find_col(cols, ["val/box_loss", "val/box", "val/giou_loss", "val/giou"])
 
     train_cls = _find_col(cols, ["train/cls_loss", "train/cls", "cls_loss"])
     val_cls = _find_col(cols, ["val/cls_loss", "val/cls"])
 
-    train_dfl = _find_col(cols, ["train/dfl_loss", "train/dfl", "dfl_loss"])
-    val_dfl = _find_col(cols, ["val/dfl_loss", "val/dfl"])
+    train_dfl = _find_col(cols, ["train/dfl_loss", "train/dfl", "dfl_loss", "train/l1_loss", "train/l1"])
+    val_dfl = _find_col(cols, ["val/dfl_loss", "val/dfl", "val/l1_loss", "val/l1"])
 
     lr_label, lr_values = _mean_lr(cols, series)
 
@@ -204,18 +225,29 @@ def plot_2x2_from_results_csv(
     ax1, ax2, ax3, ax4 = axes[0][0], axes[0][1], axes[1][0], axes[1][1]
 
     def plot_pair(ax, train_col: Optional[str], val_col: Optional[str], title_: str) -> None:
+        plotted_any = False
         if train_col and train_col in series:
             ax.plot(epochs, series[train_col], label=f"train ({train_col})")
+            plotted_any = True
         if val_col and val_col in series:
             ax.plot(epochs, series[val_col], label=f"val ({val_col})")
+            plotted_any = True
+
         ax.set_title(title_)
         ax.set_xlabel("epoch")
         ax.grid(True, alpha=0.3)
-        ax.legend()
+        if plotted_any:
+            ax.legend()
+        else:
+            ax.text(0.5, 0.5, "Loss column not found in results.csv", ha="center", va="center")
 
-    plot_pair(ax1, train_box, val_box, "Box Loss")
-    plot_pair(ax2, train_cls, val_cls, "Class Loss")
-    plot_pair(ax3, train_dfl, val_dfl, "DFL Loss")
+    box_title = _pretty_loss_name(train_box or val_box, "Box/GIoU Loss")
+    cls_title = _pretty_loss_name(train_cls or val_cls, "Class Loss")
+    dfl_title = _pretty_loss_name(train_dfl or val_dfl, "DFL/L1 Loss")
+
+    plot_pair(ax1, train_box, val_box, box_title)
+    plot_pair(ax2, train_cls, val_cls, cls_title)
+    plot_pair(ax3, train_dfl, val_dfl, dfl_title)
 
     ax4.set_title("Learning Rate")
     ax4.set_xlabel("epoch")

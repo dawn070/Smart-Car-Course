@@ -1,0 +1,611 @@
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-04 19:09:19
+  duration     :  0:00:33.572409
+  end_time     :  2026-06-04 19:09:52
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs
+  run_name     :  yolo26m_kitti_baseline_2
+  best_weights :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs\yolo26m_kitti_baseline_2\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir        :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj
+  batch           :  16
+  conf            :  0.3
+  cos_lr          :  False
+  device          :  cuda
+  epochs          :  20
+  eval_only       :  True
+  eval_test       :  True
+  eval_test_dir   :  datasets\kitti\images\test
+  eval_weights    :  runs\yolo26m_kitti_baseline_2\weights\best.pt
+  imgsz           :  640
+  log_path        :  log\yolo26m_log.txt
+  lr0             :  0.0001
+  lrf             :  0.01
+  optimizer       :  auto
+  plot_curves     :  True
+  plot_dpi        :  150
+  predict_name    :  yolo26_predict_imgs
+  project_dir     :  
+  run_name        :  yolo26m_kitti_baseline_2
+  sample_k        :  20
+  warmup_bias_lr  :  0.1
+  warmup_epochs   :  3.0
+  warmup_momentum :  0.8
+  weights         :  yolo26s.pt
+  workers         :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.937      0.841      0.915      0.634
+            Pedestrian        289        679      0.919      0.785      0.886      0.552
+               Cyclist        177        263      0.954      0.897      0.943      0.717
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-04 19:30:50
+  duration     :  0:00:32.736270
+  end_time     :  2026-06-04 19:31:23
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs
+  run_name     :  yolo26m_rain_light
+  best_weights :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs\yolo26m_kitti_baseline_2\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=0      missing_labels=400
+Hyperparameters:
+  base_dir        :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj
+  batch           :  16
+  conf            :  0.3
+  cos_lr          :  False
+  device          :  cuda
+  epochs          :  20
+  eval_only       :  True
+  eval_test       :  True
+  eval_test_dir   :  datasets\kitti\images\rain_light
+  eval_weights    :  runs\yolo26m_kitti_baseline_2\weights\best.pt
+  imgsz           :  640
+  log_path        :  log\yolo26m_log.txt
+  lr0             :  0.0001
+  lrf             :  0.01
+  optimizer       :  auto
+  plot_curves     :  True
+  plot_dpi        :  150
+  predict_name    :  yolo26_predict_imgs
+  project_dir     :  
+  run_name        :  yolo26m_rain_light
+  sample_k        :  20
+  warmup_bias_lr  :  0.1
+  warmup_epochs   :  3.0
+  warmup_momentum :  0.8
+  weights         :  yolo26s.pt
+  workers         :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400          0      0.935       0.82      0.907      0.616
+            Pedestrian        289        679       0.93      0.778      0.875      0.534
+               Cyclist        177        263      0.939      0.863      0.939      0.697
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-04 19:33:26
+  duration     :  0:00:34.803937
+  end_time     :  2026-06-04 19:34:01
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs
+  run_name     :  yolo26m_rain_heavy
+  best_weights :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs\yolo26m_kitti_baseline_2\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=0      missing_labels=400
+Hyperparameters:
+  base_dir        :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj
+  batch           :  16
+  conf            :  0.3
+  cos_lr          :  False
+  device          :  cuda
+  epochs          :  20
+  eval_only       :  True
+  eval_test       :  True
+  eval_test_dir   :  datasets\kitti\images\rain_heavy
+  eval_weights    :  runs\yolo26m_kitti_baseline_2\weights\best.pt
+  imgsz           :  640
+  log_path        :  log\yolo26m_log.txt
+  lr0             :  0.0001
+  lrf             :  0.01
+  optimizer       :  auto
+  plot_curves     :  True
+  plot_dpi        :  150
+  predict_name    :  yolo26_predict_imgs
+  project_dir     :  
+  run_name        :  yolo26m_rain_heavy
+  sample_k        :  20
+  warmup_bias_lr  :  0.1
+  warmup_epochs   :  3.0
+  warmup_momentum :  0.8
+  weights         :  yolo26s.pt
+  workers         :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400          0      0.906      0.797      0.861       0.56
+            Pedestrian        289        679      0.889      0.777      0.842      0.502
+               Cyclist        177        263      0.922      0.817       0.88      0.618
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-04 19:38:44
+  duration     :  0:00:36.834340
+  end_time     :  2026-06-04 19:39:21
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs
+  run_name     :  yolo26m_rain_light
+  best_weights :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs\yolo26m_kitti_baseline_2\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir        :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj
+  batch           :  16
+  conf            :  0.3
+  cos_lr          :  False
+  device          :  cuda
+  epochs          :  20
+  eval_only       :  True
+  eval_test       :  True
+  eval_test_dir   :  datasets\kitti\images\test
+  eval_weights    :  runs\yolo26m_kitti_baseline_2\weights\best.pt
+  imgsz           :  640
+  log_path        :  log\yolo26m_log.txt
+  lr0             :  0.0001
+  lrf             :  0.01
+  optimizer       :  auto
+  plot_curves     :  True
+  plot_dpi        :  150
+  predict_name    :  yolo26_predict_imgs
+  project_dir     :  
+  run_name        :  yolo26m_rain_light
+  sample_k        :  20
+  warmup_bias_lr  :  0.1
+  warmup_epochs   :  3.0
+  warmup_momentum :  0.8
+  weights         :  yolo26s.pt
+  workers         :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.935       0.82      0.907      0.616
+            Pedestrian        289        679       0.93      0.778      0.875      0.534
+               Cyclist        177        263      0.939      0.863      0.939      0.697
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-04 19:44:41
+  duration     :  0:00:35.082510
+  end_time     :  2026-06-04 19:45:16
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs
+  run_name     :  yolo26m_rain_light
+  best_weights :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs\yolo26m_kitti_baseline_2\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=0      missing_labels=400
+Hyperparameters:
+  base_dir        :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj
+  batch           :  16
+  conf            :  0.3
+  cos_lr          :  False
+  device          :  cuda
+  epochs          :  20
+  eval_only       :  True
+  eval_test       :  True
+  eval_test_dir   :  datasets\kitti\images\rain_light
+  eval_weights    :  runs\yolo26m_kitti_baseline_2\weights\best.pt
+  imgsz           :  640
+  log_path        :  log\yolo26m_log.txt
+  lr0             :  0.0001
+  lrf             :  0.01
+  optimizer       :  auto
+  plot_curves     :  True
+  plot_dpi        :  150
+  predict_name    :  yolo26_predict_imgs
+  project_dir     :  
+  run_name        :  yolo26m_rain_light
+  sample_k        :  20
+  warmup_bias_lr  :  0.1
+  warmup_epochs   :  3.0
+  warmup_momentum :  0.8
+  weights         :  yolo26s.pt
+  workers         :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400          0      0.935       0.82      0.907      0.616
+            Pedestrian        289        679       0.93      0.778      0.875      0.534
+               Cyclist        177        263      0.939      0.863      0.939      0.697
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-04 19:47:07
+  duration     :  0:00:35.235024
+  end_time     :  2026-06-04 19:47:42
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs
+  run_name     :  yolo26m_rain_light
+  best_weights :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs\yolo26m_kitti_baseline_2\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=0      missing_labels=400
+Hyperparameters:
+  base_dir        :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj
+  batch           :  16
+  conf            :  0.3
+  cos_lr          :  False
+  device          :  cuda
+  epochs          :  20
+  eval_only       :  True
+  eval_test       :  True
+  eval_test_dir   :  datasets\kitti\images\rain_light
+  eval_weights    :  runs\yolo26m_kitti_baseline_2\weights\best.pt
+  imgsz           :  640
+  log_path        :  log\yolo26m_log.txt
+  lr0             :  0.0001
+  lrf             :  0.01
+  optimizer       :  auto
+  plot_curves     :  True
+  plot_dpi        :  150
+  predict_name    :  yolo26_predict_imgs
+  project_dir     :  
+  run_name        :  yolo26m_rain_light
+  sample_k        :  20
+  warmup_bias_lr  :  0.1
+  warmup_epochs   :  3.0
+  warmup_momentum :  0.8
+  weights         :  yolo26s.pt
+  workers         :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400          0      0.935       0.82      0.907      0.616
+            Pedestrian        289        679       0.93      0.778      0.875      0.534
+               Cyclist        177        263      0.939      0.863      0.939      0.697
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-04 19:52:10
+  duration     :  0:00:34.801975
+  end_time     :  2026-06-04 19:52:44
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs
+  run_name     :  yolo26m_rain_light
+  best_weights :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs\yolo26m_kitti_baseline_2\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=0      missing_labels=400
+Hyperparameters:
+  base_dir        :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj
+  batch           :  16
+  conf            :  0.3
+  cos_lr          :  False
+  device          :  cuda
+  epochs          :  20
+  eval_only       :  True
+  eval_test       :  True
+  eval_test_dir   :  datasets\kitti\images\rain_light
+  eval_weights    :  runs\yolo26m_kitti_baseline_2\weights\best.pt
+  imgsz           :  640
+  log_path        :  log\yolo26m_log.txt
+  lr0             :  0.0001
+  lrf             :  0.01
+  optimizer       :  auto
+  plot_curves     :  True
+  plot_dpi        :  150
+  predict_name    :  yolo26_predict_imgs
+  project_dir     :  
+  run_name        :  yolo26m_rain_light
+  sample_k        :  20
+  warmup_bias_lr  :  0.1
+  warmup_epochs   :  3.0
+  warmup_momentum :  0.8
+  weights         :  yolo26s.pt
+  workers         :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400          0      0.935       0.82      0.907      0.616
+            Pedestrian        289        679       0.93      0.778      0.875      0.534
+               Cyclist        177        263      0.939      0.863      0.939      0.697
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-04 19:54:32
+  duration     :  0:00:34.444469
+  end_time     :  2026-06-04 19:55:06
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs
+  run_name     :  yolo26m_rain_light
+  best_weights :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs\yolo26m_kitti_baseline_2\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir        :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj
+  batch           :  16
+  conf            :  0.3
+  cos_lr          :  False
+  device          :  cuda
+  epochs          :  20
+  eval_only       :  True
+  eval_test       :  True
+  eval_test_dir   :  datasets\kitti\images\test
+  eval_weights    :  runs\yolo26m_kitti_baseline_2\weights\best.pt
+  imgsz           :  640
+  log_path        :  log\yolo26m_log.txt
+  lr0             :  0.0001
+  lrf             :  0.01
+  optimizer       :  auto
+  plot_curves     :  True
+  plot_dpi        :  150
+  predict_name    :  yolo26_predict_imgs
+  project_dir     :  
+  run_name        :  yolo26m_rain_light
+  sample_k        :  20
+  warmup_bias_lr  :  0.1
+  warmup_epochs   :  3.0
+  warmup_momentum :  0.8
+  weights         :  yolo26s.pt
+  workers         :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.935       0.82      0.907      0.616
+            Pedestrian        289        679       0.93      0.778      0.875      0.534
+               Cyclist        177        263      0.939      0.863      0.939      0.697
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-04 19:57:52
+  duration     :  0:00:35.410105
+  end_time     :  2026-06-04 19:58:27
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs
+  run_name     :  yolo26m_kitti_baseline_2
+  best_weights :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs\yolo26m_kitti_baseline_2\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir        :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj
+  batch           :  16
+  conf            :  0.3
+  cos_lr          :  False
+  device          :  cuda
+  epochs          :  20
+  eval_only       :  True
+  eval_test       :  True
+  eval_test_dir   :  datasets\kitti\images\test
+  eval_weights    :  runs\yolo26m_kitti_baseline_2\weights\best.pt
+  imgsz           :  640
+  log_path        :  log\yolo26m_log.txt
+  lr0             :  0.0001
+  lrf             :  0.01
+  optimizer       :  auto
+  plot_curves     :  True
+  plot_dpi        :  150
+  predict_name    :  yolo26_predict_imgs
+  project_dir     :  
+  run_name        :  yolo26m_kitti_baseline_2
+  sample_k        :  20
+  warmup_bias_lr  :  0.1
+  warmup_epochs   :  3.0
+  warmup_momentum :  0.8
+  weights         :  yolo26s.pt
+  workers         :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.937      0.841      0.915      0.634
+            Pedestrian        289        679      0.919      0.785      0.886      0.552
+               Cyclist        177        263      0.954      0.897      0.943      0.717
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-04 20:01:13
+  duration     :  0:00:35.067614
+  end_time     :  2026-06-04 20:01:48
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs
+  run_name     :  yolo26m_rain_heavy
+  best_weights :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs\yolo26m_kitti_baseline_2\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir        :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj
+  batch           :  16
+  conf            :  0.3
+  cos_lr          :  False
+  device          :  cuda
+  epochs          :  20
+  eval_only       :  True
+  eval_test       :  True
+  eval_test_dir   :  datasets\kitti\images\test
+  eval_weights    :  runs\yolo26m_kitti_baseline_2\weights\best.pt
+  imgsz           :  640
+  log_path        :  log\yolo26m_log.txt
+  lr0             :  0.0001
+  lrf             :  0.01
+  optimizer       :  auto
+  plot_curves     :  True
+  plot_dpi        :  150
+  predict_name    :  yolo26_predict_imgs
+  project_dir     :  
+  run_name        :  yolo26m_rain_heavy
+  sample_k        :  20
+  warmup_bias_lr  :  0.1
+  warmup_epochs   :  3.0
+  warmup_momentum :  0.8
+  weights         :  yolo26s.pt
+  workers         :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.906      0.797      0.861       0.56
+            Pedestrian        289        679      0.889      0.777      0.842      0.502
+               Cyclist        177        263      0.922      0.817       0.88      0.618
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-06 18:59:10
+  duration     :  0:00:38.535084
+  end_time     :  2026-06-06 18:59:49
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs
+  run_name     :  yolo26m_fog
+  best_weights :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs\yolo26m_kitti_baseline_2\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir        :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj
+  batch           :  16
+  conf            :  0.3
+  cos_lr          :  False
+  device          :  cuda
+  epochs          :  20
+  eval_only       :  True
+  eval_test       :  True
+  eval_test_dir   :  datasets\kitti\images\test
+  eval_weights    :  runs\yolo26m_kitti_baseline_2\weights\best.pt
+  imgsz           :  640
+  log_path        :  log\yolo26m_log.txt
+  lr0             :  0.0001
+  lrf             :  0.01
+  optimizer       :  auto
+  plot_curves     :  True
+  plot_dpi        :  150
+  predict_name    :  yolo26_predict_imgs
+  project_dir     :  
+  run_name        :  yolo26m_fog
+  sample_k        :  20
+  warmup_bias_lr  :  0.1
+  warmup_epochs   :  3.0
+  warmup_momentum :  0.8
+  weights         :  yolo26s.pt
+  workers         :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.892      0.486      0.538      0.346
+            Pedestrian        289        679      0.918      0.378      0.436      0.255
+               Cyclist        177        263      0.866      0.593       0.64      0.437
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-06 19:02:58
+  duration     :  0:00:36.959528
+  end_time     :  2026-06-06 19:03:35
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs
+  run_name     :  yolo26m_frost
+  best_weights :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs\yolo26m_kitti_baseline_2\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir        :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj
+  batch           :  16
+  conf            :  0.3
+  cos_lr          :  False
+  device          :  cuda
+  epochs          :  20
+  eval_only       :  True
+  eval_test       :  True
+  eval_test_dir   :  datasets\kitti\images\test
+  eval_weights    :  runs\yolo26m_kitti_baseline_2\weights\best.pt
+  imgsz           :  640
+  log_path        :  log\yolo26m_log.txt
+  lr0             :  0.0001
+  lrf             :  0.01
+  optimizer       :  auto
+  plot_curves     :  True
+  plot_dpi        :  150
+  predict_name    :  yolo26_predict_imgs
+  project_dir     :  
+  run_name        :  yolo26m_frost
+  sample_k        :  20
+  warmup_bias_lr  :  0.1
+  warmup_epochs   :  3.0
+  warmup_momentum :  0.8
+  weights         :  yolo26s.pt
+  workers         :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.842      0.305      0.368      0.209
+            Pedestrian        289        679      0.857      0.305      0.355      0.202
+               Cyclist        177        263      0.828      0.304       0.38      0.216
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-06 19:05:09
+  duration     :  0:00:37.688658
+  end_time     :  2026-06-06 19:05:47
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs
+  run_name     :  yolo26m_snow
+  best_weights :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\runs\yolo26m_kitti_baseline_2\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir        :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj
+  batch           :  16
+  conf            :  0.3
+  cos_lr          :  False
+  device          :  cuda
+  epochs          :  20
+  eval_only       :  True
+  eval_test       :  True
+  eval_test_dir   :  datasets\kitti\images\test
+  eval_weights    :  runs\yolo26m_kitti_baseline_2\weights\best.pt
+  imgsz           :  640
+  log_path        :  log\yolo26m_log.txt
+  lr0             :  0.0001
+  lrf             :  0.01
+  optimizer       :  auto
+  plot_curves     :  True
+  plot_dpi        :  150
+  predict_name    :  yolo26_predict_imgs
+  project_dir     :  
+  run_name        :  yolo26m_snow
+  sample_k        :  20
+  warmup_bias_lr  :  0.1
+  warmup_epochs   :  3.0
+  warmup_momentum :  0.8
+  weights         :  yolo26s.pt
+  workers         :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942       0.76      0.343      0.374        0.2
+            Pedestrian        289        679      0.816      0.305      0.371      0.194
+               Cyclist        177        263      0.704       0.38      0.378      0.206
+============================================================================================
