@@ -113,7 +113,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 	parser.add_argument(
 		"--sample-k",
 		type=int,
-		default=6,
+		default=10,
 		help="抽样验证集图片数",
 	)
 	parser.add_argument(
@@ -145,6 +145,24 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 		type=int,
 		default=150,
 		help="曲线图输出 DPI",
+	)
+	parser.add_argument(
+		"--eval-only",
+		action="store_true",
+		default=False,
+		help="跳过训练，直接使用指定权重进行测试集评估与预测可视化",
+	)
+	parser.add_argument(
+		"--eval-weights",
+		type=str,
+		default="",
+		help="eval-only 模式下使用的权重文件路径（支持相对 base-dir 的相对路径）",
+	)
+	parser.add_argument(
+		"--eval-test-dir",
+		type=str,
+		default="",
+		help="eval-only 模式下测试集目录（覆盖 yaml 中的 test 路径，支持绝对或相对 base-dir 的路径）",
 	)
 	return parser
 
@@ -178,65 +196,106 @@ def main():
 		)
 	model = YOLO(weights_path)
 
-	print("\n=== 2. 开始在 KITTI 数据集上进行微调 (Fine-tune) ===")
-
 	run_name = args.run_name
-	model.train(
-		data=yaml_rel_path,
-		epochs=args.epochs,
-		imgsz=args.imgsz,
-		batch=args.batch,
-		optimizer=args.optimizer.lower() if isinstance(args.optimizer, str) else args.optimizer,
-		lr0=args.lr0,
-		lrf=args.lrf,
-		cos_lr=args.cos_lr,
-		warmup_epochs=args.warmup_epochs,
-		warmup_momentum=args.warmup_momentum,
-		warmup_bias_lr=args.warmup_bias_lr,
-		project=project_dir,
-		name=run_name,
-		exist_ok=True,  # 允许覆盖原来的文件夹，防止不断生成 *1, *2 等目录
-		device=args.device,      # 自动检测环境，有GPU用GPU，没有用CPU
-		workers=args.workers      # 禁用多进程，避免 Windows 下静默崩溃
-	)
 
-	print("\n=== 3. 模型训练完成 ===")
-	print("模型训练过程中会使用验证集进行评估，并自动保存最优权重 best.pt。")
-	print(
-		f"Loss/指标曲线 (results.png) 等已保存在: {os.path.join(project_dir, run_name)} 目录下。"
-	)
+	if args.eval_only:
+		# ========== eval-only 模式：跳过训练，直接加载指定权重进行评估 ==========
+		print("\n=== [eval-only 模式] 跳过训练，直接加载指定权重 ===")
+		eval_weights_arg = args.eval_weights.strip() if args.eval_weights else args.weights
+		best_weights = eval_weights_arg
+		if not os.path.isabs(best_weights):
+			best_weights = os.path.join(base_dir, best_weights)
+		print(f"评估权重路径: {best_weights} | exists={os.path.exists(best_weights)}")
+		if not os.path.exists(best_weights):
+			raise FileNotFoundError(
+				"未找到评估权重文件。请用 --eval-weights 指定正确的权重路径。\n"
+				f"当前: {best_weights}"
+			)
 
-	if args.plot_curves:
-		run_dir = Path(project_dir) / run_name
-		results_csv = run_dir / "results.csv"
-		out_png = run_dir / "curves_2x2.png"
-		try:
-			if results_csv.exists():
-				plot_2x2_from_results_csv(
-					results_csv=results_csv,
-					out_path=out_png,
-					dpi=int(args.plot_dpi),
-					show=False,
-					title=f"Training Curves: {run_dir.as_posix()}",
-				)
-			else:
-				print(f"[提示] 未找到 results.csv，跳过绘图: {results_csv}")
-		except Exception as e:
-			print(f"[提示] 绘图失败（不影响训练结果）：{e}")
+		# 如果指定了 --eval-test-dir，动态生成临时 yaml 覆盖测试集路径
+		if args.eval_test_dir.strip():
+			eval_test_dir = args.eval_test_dir.strip()
+			if not os.path.isabs(eval_test_dir):
+				eval_test_dir = os.path.join(base_dir, eval_test_dir)
+			print(f"使用自定义测试集目录: {eval_test_dir}")
+			if not os.path.isdir(eval_test_dir):
+				raise FileNotFoundError(f"测试集目录不存在: {eval_test_dir}")
 
-	print("\n=== 4. 抽取验证集图片进行检测可视化 ===")
-	best_weights = _find_latest_best_weight(project_dir, run_name)
-	if not best_weights:
-		raise FileNotFoundError(
-			f"未找到 best.pt，请检查训练是否成功完成。期望在: {os.path.join(project_dir, run_name, 'weights')}"
+			tmp_yaml = os.path.join(base_dir, "Src", "Train", "_eval_temp.yaml")
+			with open(tmp_yaml, "w", encoding="utf-8") as f:
+				f.write(f"path: {eval_test_dir}\n")
+				f.write("train: .\n")
+				f.write("val: .\n")
+				f.write("test: .\n")
+				f.write("nc: 2\n")
+				f.write("names:\n")
+				f.write("  0: Pedestrian\n")
+				f.write("  1: Cyclist\n")
+			eval_data_yaml = tmp_yaml
+		else:
+			eval_data_yaml = yaml_rel_path
+	else:
+		# ========== 正常训练模式 ==========
+		print("\n=== 2. 开始在 KITTI 数据集上进行微调 (Fine-tune) ===")
+
+		model.train(
+			data=yaml_rel_path,
+			epochs=args.epochs,
+			imgsz=args.imgsz,
+			batch=args.batch,
+			optimizer=args.optimizer.lower() if isinstance(args.optimizer, str) else args.optimizer,
+			lr0=args.lr0,
+			lrf=args.lrf,
+			cos_lr=args.cos_lr,
+			warmup_epochs=args.warmup_epochs,
+			warmup_momentum=args.warmup_momentum,
+			warmup_bias_lr=args.warmup_bias_lr,
+			project=project_dir,
+			name=run_name,
+			exist_ok=True,  # 允许覆盖原来的文件夹，防止不断生成 *1, *2 等目录
+			device=args.device,      # 自动检测环境，有GPU用GPU，没有用CPU
+			workers=args.workers      # 禁用多进程，避免 Windows 下静默崩溃
 		)
 
+		print("\n=== 3. 模型训练完成 ===")
+		print("模型训练过程中会使用验证集进行评估，并自动保存最优权重 best.pt。")
+		print(
+			f"Loss/指标曲线 (results.png) 等已保存在: {os.path.join(project_dir, run_name)} 目录下。"
+		)
+
+		if args.plot_curves:
+			run_dir = Path(project_dir) / run_name
+			results_csv = run_dir / "results.csv"
+			out_png = run_dir / "curves_2x2.png"
+			try:
+				if results_csv.exists():
+					plot_2x2_from_results_csv(
+						results_csv=results_csv,
+						out_path=out_png,
+						dpi=int(args.plot_dpi),
+						show=False,
+						title=f"Training Curves: {run_dir.as_posix()}",
+					)
+				else:
+					print(f"[提示] 未找到 results.csv，跳过绘图: {results_csv}")
+			except Exception as e:
+				print(f"[提示] 绘图失败（不影响训练结果）：{e}")
+
+		print("\n=== 4. 抽取验证集图片进行检测可视化 ===")
+		best_weights = _find_latest_best_weight(project_dir, run_name)
+		if not best_weights:
+			raise FileNotFoundError(
+				f"未找到 best.pt，请检查训练是否成功完成。期望在: {os.path.join(project_dir, run_name, 'weights')}"
+			)
+		eval_data_yaml = yaml_rel_path
+
+	# ========== 公共部分：测试集评估 + 可视化 ==========
 	best_model = YOLO(best_weights)
 	test_results_csv = None
 	if args.eval_test:
 		print("\n=== 4.1 使用测试集评估模型性能 ===")
 		metrics = best_model.val(
-			data=yaml_rel_path,
+			data=eval_data_yaml,
 			split="test",
 			project=project_dir,
 			name=os.path.join(run_name, "test_eval"),
@@ -250,15 +309,16 @@ def main():
 			total_instances=dataset_info.counts_test.instances,
 		)
 
-	val_images_dir_for_predict = str(dataset_info.val_images_dir)
-	all_val_imgs = glob.glob(os.path.join(val_images_dir_for_predict, "*.png")) + glob.glob(
-		os.path.join(val_images_dir_for_predict, "*.jpg")
+	test_images_dir_for_predict = str(dataset_info.test_images_dir)
+	all_test_imgs = glob.glob(os.path.join(test_images_dir_for_predict, "*.png")) + glob.glob(
+		os.path.join(test_images_dir_for_predict, "*.jpg")
 	)
-	if not all_val_imgs:
-		raise FileNotFoundError(f"验证集图片为空或路径不对: {val_images_dir_for_predict}")
+	# print("测试集目录为：", all_test_imgs)
+	if not all_test_imgs:
+		raise FileNotFoundError(f"测试集图片为空或路径不对: {test_images_dir_for_predict}")
 
-	k = min(args.sample_k, len(all_val_imgs))
-	sample_imgs = random.sample(all_val_imgs, k)
+	k = min(args.sample_k, len(all_test_imgs))
+	sample_imgs = random.sample(all_test_imgs, k)
 
 	best_model.predict(
 		source=sample_imgs,
