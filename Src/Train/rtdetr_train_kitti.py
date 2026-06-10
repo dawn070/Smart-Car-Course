@@ -20,21 +20,29 @@ from plot_training_curves import plot_2x2_from_results_csv
 random.seed(42)
 
 
-def _find_latest_best_weight(project_dir: str, run_name: str) -> Optional[str]:
-	"""尽量找到最新一次训练生成的 best.pt。"""
+def _find_latest_weight(project_dir: str, run_name: str, weight_file: str) -> Optional[str]:
+	"""尽量找到最新一次训练生成的权重文件（best.pt/last.pt）。"""
 	# 优先使用固定目录
-	candidate = os.path.join(project_dir, run_name, "weights", "best.pt")
+	candidate = os.path.join(project_dir, run_name, "weights", weight_file)
 	if os.path.exists(candidate):
 		return candidate
 
 	# 如果 Ultralytics 自动递增目录名，则兜底搜索
-	pattern = os.path.join(project_dir, f"{run_name}*", "weights", "best.pt")
+	pattern = os.path.join(project_dir, f"{run_name}*", "weights", weight_file)
 	matches = glob.glob(pattern)
 	if not matches:
 		return None
 
 	matches.sort(key=lambda p: os.path.getmtime(p), reverse=True)
 	return matches[0]
+
+
+def _find_latest_best_weight(project_dir: str, run_name: str) -> Optional[str]:
+	return _find_latest_weight(project_dir, run_name, "best.pt")
+
+
+def _find_latest_last_weight(project_dir: str, run_name: str) -> Optional[str]:
+	return _find_latest_weight(project_dir, run_name, "last.pt")
 
 
 def _build_arg_parser() -> argparse.ArgumentParser:
@@ -52,6 +60,24 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 		help=(
 			"预训练权重路径（支持相对 base-dir 的相对路径）。"
 			"例如: rtdetr-l.pt 或 runs/.../weights/best.pt"
+		),
+	)
+	parser.add_argument(
+		"--resume",
+		action="store_true",
+		default=False,
+		help=(
+			"断点续训：优先从 runs/<run-name>/weights/last.pt 继续训练，"
+			"并尽量保留优化器/学习率等状态（Ultralytics resume）。"
+		),
+	)
+	parser.add_argument(
+		"--resume-ckpt",
+		type=str,
+		default="",
+		help=(
+			"手动指定断点权重（通常是 last.pt）。"
+			"支持相对 base-dir 的相对路径。"
 		),
 	)
 	parser.add_argument("--epochs", type=int, default=20, help="训练轮数")
@@ -144,6 +170,24 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 		default=150,
 		help="曲线图输出 DPI",
 	)
+	parser.add_argument(
+		"--eval-only",
+		action="store_true",
+		default=False,
+		help="跳过训练，直接使用指定权重进行测试集评估与预测可视化",
+	)
+	parser.add_argument(
+		"--eval-weights",
+		type=str,
+		default="",
+		help="eval-only 模式下使用的权重文件路径（支持相对 base-dir 的相对路径）",
+	)
+	parser.add_argument(
+		"--eval-test-dir",
+		type=str,
+		default="",
+		help="eval-only 模式下测试集目录（覆盖 yaml 中的 test 路径，支持绝对或相对 base-dir 的路径）",
+	)
 	return parser
 
 
@@ -175,79 +219,138 @@ def main():
 	yaml_rel_path = os.path.join("Src", "Train", "kitti.yaml")
 	dataset_info = collect_dataset_info(base_dir, yaml_rel_path)
 
-	print("=== 1. 加载 RT-DETR 预训练模型 ===")
-	weights_arg = str(args.weights).strip()
-	weights_path = weights_arg
-	if not os.path.isabs(weights_path):
-		weights_path = os.path.join(base_dir, weights_path)
-	print(f"预训练权重路径: {weights_path} | exists={os.path.exists(weights_path)}")
-	if not os.path.exists(weights_path):
-		raise FileNotFoundError(
-			"未找到预训练权重文件。请将 rtdetr-l.pt 放到项目根目录，"
-			"或用 --weights 指定正确路径。\n"
-			f"当前: {weights_path}"
-		)
+	print("=== 1. 加载 RT-DETR 模型/权重 ===")
+	run_name = args.run_name
+
+	resume_ckpt = str(args.resume_ckpt).strip() if args.resume_ckpt else ""
+	if args.resume:
+		if resume_ckpt:
+			weights_path = resume_ckpt
+			if not os.path.isabs(weights_path):
+				weights_path = os.path.join(base_dir, weights_path)
+		else:
+			weights_path = _find_latest_last_weight(project_dir, run_name) or ""
+		if not weights_path:
+			raise FileNotFoundError(
+				"未找到可用于续训的 last.pt。你可以：\n"
+				f"1) 确认存在 {os.path.join(project_dir, run_name, 'weights', 'last.pt')}\n"
+				"2) 或者使用 --resume-ckpt 手动指定 last.pt 路径"
+			)
+		print(f"[Resume] 使用断点权重: {weights_path} | exists={os.path.exists(weights_path)}")
+		if not os.path.exists(weights_path):
+			raise FileNotFoundError(f"断点权重不存在: {weights_path}")
+	else:
+		weights_arg = str(args.weights).strip()
+		weights_path = weights_arg
+		if not os.path.isabs(weights_path):
+			weights_path = os.path.join(base_dir, weights_path)
+		print(f"预训练权重路径: {weights_path} | exists={os.path.exists(weights_path)}")
+		if not os.path.exists(weights_path):
+			raise FileNotFoundError(
+				"未找到预训练权重文件。请将 rtdetr-l.pt 放到项目根目录，"
+				"或用 --weights 指定正确路径。\n"
+				f"当前: {weights_path}"
+			)
 
 	model = _load_rtdetr(weights_path)
 
-	print("\n=== 2. 开始在 KITTI 数据集上进行微调 (Fine-tune) ===")
-	run_name = args.run_name
+	if args.eval_only:
+		# ========== eval-only 模式：跳过训练，直接加载指定权重进行评估 ==========
+		print("\n=== [eval-only 模式] 跳过训练，直接加载指定权重 ===")
+		eval_weights_arg = args.eval_weights.strip() if args.eval_weights else args.weights
+		best_weights = eval_weights_arg
+		if not os.path.isabs(best_weights):
+			best_weights = os.path.join(base_dir, best_weights)
+		print(f"评估权重路径: {best_weights} | exists={os.path.exists(best_weights)}")
+		if not os.path.exists(best_weights):
+			raise FileNotFoundError(
+				"未找到评估权重文件。请用 --eval-weights 指定正确的权重路径。\n"
+				f"当前: {best_weights}"
+			)
 
-	model.train(
-		data=yaml_rel_path,
-		epochs=args.epochs,
-		imgsz=args.imgsz,
-		batch=args.batch,
-		optimizer=args.optimizer.lower() if isinstance(args.optimizer, str) else args.optimizer,
-		lr0=args.lr0,
-		lrf=args.lrf,
-		cos_lr=args.cos_lr,
-		warmup_epochs=args.warmup_epochs,
-		freeze=int(args.freeze) if args.freeze is not None else 0,
-		project=project_dir,
-		name=run_name,
-		exist_ok=True,
-		device=args.device,
-		workers=args.workers,
-	)
+		# 如果指定了 --eval-test-dir，动态生成临时 yaml 覆盖测试集路径
+		if args.eval_test_dir.strip():
+			eval_test_dir = args.eval_test_dir.strip()
+			if not os.path.isabs(eval_test_dir):
+				eval_test_dir = os.path.join(base_dir, eval_test_dir)
+			print(f"使用自定义测试集目录: {eval_test_dir}")
+			if not os.path.isdir(eval_test_dir):
+				raise FileNotFoundError(f"测试集目录不存在: {eval_test_dir}")
 
-	print("\n=== 3. 模型训练完成 ===")
-	print(
-		f"训练输出目录: {os.path.join(project_dir, run_name)} | "
-		"包含 weights/best.pt、results.csv 等。"
-	)
-
-	if args.plot_curves:
-		run_dir = Path(project_dir) / run_name
-		results_csv = run_dir / "results.csv"
-		out_png = run_dir / "curves_2x2.png"
-		try:
-			if results_csv.exists():
-				plot_2x2_from_results_csv(
-					results_csv=results_csv,
-					out_path=out_png,
-					dpi=int(args.plot_dpi),
-					show=False,
-					title=f"Training Curves: {run_dir.as_posix()}",
-				)
-			else:
-				print(f"[提示] 未找到 results.csv，跳过绘图: {results_csv}")
-		except Exception as e:
-			print(f"[提示] 绘图失败（不影响训练结果）：{e}")
-
-	print("\n=== 4. 抽取验证集图片进行检测可视化 ===")
-	best_weights = _find_latest_best_weight(project_dir, run_name)
-	if not best_weights:
-		raise FileNotFoundError(
-			f"未找到 best.pt，请检查训练是否成功完成。期望在: {os.path.join(project_dir, run_name, 'weights')}"
+			tmp_yaml = os.path.join(base_dir, "Src", "Train", "_eval_temp.yaml")
+			with open(tmp_yaml, "w", encoding="utf-8") as f:
+				f.write(f"path: {eval_test_dir}\n")
+				f.write("train: .\n")
+				f.write("val: .\n")
+				f.write("test: .\n")
+				f.write("nc: 2\n")
+				f.write("names:\n")
+				f.write("  0: Pedestrian\n")
+				f.write("  1: Cyclist\n")
+			eval_data_yaml = tmp_yaml
+		else:
+			eval_data_yaml = yaml_rel_path
+	else:
+		# ========== 正常训练模式 ==========
+		print("\n=== 2. 开始在 KITTI 数据集上进行微调 (Fine-tune) ===")
+		model.train(
+			data=yaml_rel_path,
+			epochs=args.epochs,
+			imgsz=args.imgsz,
+			batch=args.batch,
+			optimizer=args.optimizer.lower() if isinstance(args.optimizer, str) else args.optimizer,
+			lr0=args.lr0,
+			lrf=args.lrf,
+			cos_lr=args.cos_lr,
+			warmup_epochs=args.warmup_epochs,
+			freeze=int(args.freeze) if args.freeze is not None else 0,
+			project=project_dir,
+			name=run_name,
+			exist_ok=True,
+			device=args.device,
+			workers=args.workers,
+			resume=bool(args.resume),
 		)
 
+		print("\n=== 3. 模型训练完成 ===")
+		print(
+			f"训练输出目录: {os.path.join(project_dir, run_name)} | "
+			"包含 weights/best.pt、results.csv 等。"
+		)
+
+		if args.plot_curves:
+			run_dir = Path(project_dir) / run_name
+			results_csv = run_dir / "results.csv"
+			out_png = run_dir / "curves_2x2.png"
+			try:
+				if results_csv.exists():
+					plot_2x2_from_results_csv(
+						results_csv=results_csv,
+						out_path=out_png,
+						dpi=int(args.plot_dpi),
+						show=False,
+						title=f"Training Curves: {run_dir.as_posix()}",
+					)
+				else:
+					print(f"[提示] 未找到 results.csv，跳过绘图: {results_csv}")
+			except Exception as e:
+				print(f"[提示] 绘图失败（不影响训练结果）：{e}")
+
+		print("\n=== 4. 抽取验证集图片进行检测可视化 ===")
+		best_weights = _find_latest_best_weight(project_dir, run_name)
+		if not best_weights:
+			raise FileNotFoundError(
+				f"未找到 best.pt，请检查训练是否成功完成。期望在: {os.path.join(project_dir, run_name, 'weights')}"
+			)
+		eval_data_yaml = yaml_rel_path
+
+	# ========== 公共部分：测试集评估 + 可视化 ==========
 	best_model = _load_rtdetr(best_weights)
 	test_results_csv = None
 	if args.eval_test:
 		print("\n=== 4.1 使用测试集评估模型性能 ===")
 		metrics = best_model.val(
-			data=yaml_rel_path,
+			data=eval_data_yaml,
 			split="test",
 			project=project_dir,
 			name=os.path.join(run_name, "test_eval"),
@@ -261,15 +364,15 @@ def main():
 			total_instances=dataset_info.counts_test.instances,
 		)
 
-	val_images_dir_for_predict = str(dataset_info.val_images_dir)
-	all_val_imgs = glob.glob(os.path.join(val_images_dir_for_predict, "*.png")) + glob.glob(
-		os.path.join(val_images_dir_for_predict, "*.jpg")
+	test_images_dir_for_predict = str(dataset_info.test_images_dir)
+	all_test_imgs = glob.glob(os.path.join(test_images_dir_for_predict, "*.png")) + glob.glob(
+		os.path.join(test_images_dir_for_predict, "*.jpg")
 	)
-	if not all_val_imgs:
-		raise FileNotFoundError(f"验证集图片为空或路径不对: {val_images_dir_for_predict}")
+	if not all_test_imgs:
+		raise FileNotFoundError(f"测试集图片为空或路径不对: {test_images_dir_for_predict}")
 
-	k = min(args.sample_k, len(all_val_imgs))
-	sample_imgs = random.sample(all_val_imgs, k)
+	k = min(args.sample_k, len(all_test_imgs))
+	sample_imgs = random.sample(all_test_imgs, k)
 
 	best_model.predict(
 		source=sample_imgs,
