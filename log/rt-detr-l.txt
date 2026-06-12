@@ -1,0 +1,433 @@
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-07 19:18:21
+  duration     :  0:01:04.441920
+  end_time     :  2026-06-07 19:19:25
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs
+  run_name     :  rtdetr_l_kitti_03
+  best_weights :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs\rtdetr_l_kitti_03\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir      :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj
+  batch         :  8
+  conf          :  0.3
+  cos_lr        :  False
+  device        :  cuda
+  epochs        :  20
+  eval_only     :  True
+  eval_test     :  True
+  eval_test_dir :  datasets\kitti\images\test
+  eval_weights  :  runs\rtdetr_l_kitti_03\weights\best.pt
+  freeze        :  0
+  imgsz         :  640
+  log_path      :  log\rt-detr-l.txt
+  lr0           :  0.0001
+  lrf           :  0.01
+  optimizer     :  auto
+  plot_curves   :  True
+  plot_dpi      :  150
+  predict_name  :  rtdetr_predict_imgs
+  project_dir   :  
+  resume        :  False
+  resume_ckpt   :  
+  run_name      :  rtdetr_l_kitti_03
+  sample_k      :  20
+  warmup_epochs :  3.0
+  weights       :  rtdetr-l.pt
+  workers       :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.916      0.895      0.923      0.652
+            Pedestrian        289        679      0.904      0.866      0.892      0.561
+               Cyclist        177        263      0.928      0.924      0.954      0.743
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-08 12:12:36
+  duration     :  0:00:55.273992
+  end_time     :  2026-06-08 12:13:31
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs
+  run_name     :  rtdetr_l_kitti_rain_light
+  best_weights :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs\rtdetr_l_kitti_03\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir      :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj
+  batch         :  8
+  conf          :  0.3
+  cos_lr        :  False
+  device        :  cuda
+  epochs        :  20
+  eval_only     :  True
+  eval_test     :  True
+  eval_test_dir :  datasets\kitti\images\test
+  eval_weights  :  runs\rtdetr_l_kitti_03\weights\best.pt
+  freeze        :  0
+  imgsz         :  640
+  log_path      :  log\rt-detr-l.txt
+  lr0           :  0.0001
+  lrf           :  0.01
+  optimizer     :  auto
+  plot_curves   :  True
+  plot_dpi      :  150
+  predict_name  :  rtdetr_predict_imgs
+  project_dir   :  
+  resume        :  False
+  resume_ckpt   :  
+  run_name      :  rtdetr_l_kitti_rain_light
+  sample_k      :  20
+  warmup_epochs :  3.0
+  weights       :  rtdetr-l.pt
+  workers       :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.927      0.873      0.918      0.638
+            Pedestrian        289        679      0.917      0.829      0.885       0.55
+               Cyclist        177        263      0.937      0.916      0.951      0.725
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-08 12:14:35
+  duration     :  0:00:55.424997
+  end_time     :  2026-06-08 12:15:30
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs
+  run_name     :  rtdetr_l_kitti_03
+  best_weights :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs\rtdetr_l_kitti_03\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir      :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj
+  batch         :  8
+  conf          :  0.3
+  cos_lr        :  False
+  device        :  cuda
+  epochs        :  20
+  eval_only     :  True
+  eval_test     :  True
+  eval_test_dir :  datasets\kitti\images\test
+  eval_weights  :  runs\rtdetr_l_kitti_03\weights\best.pt
+  freeze        :  0
+  imgsz         :  640
+  log_path      :  log\rt-detr-l.txt
+  lr0           :  0.0001
+  lrf           :  0.01
+  optimizer     :  auto
+  plot_curves   :  True
+  plot_dpi      :  150
+  predict_name  :  rtdetr_predict_imgs
+  project_dir   :  
+  resume        :  False
+  resume_ckpt   :  
+  run_name      :  rtdetr_l_kitti_03
+  sample_k      :  20
+  warmup_epochs :  3.0
+  weights       :  rtdetr-l.pt
+  workers       :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.927      0.873      0.918      0.638
+            Pedestrian        289        679      0.917      0.829      0.885       0.55
+               Cyclist        177        263      0.937      0.916      0.951      0.725
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-08 12:16:19
+  duration     :  0:00:48.967365
+  end_time     :  2026-06-08 12:17:08
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs
+  run_name     :  rtdetr_l_kitti_03
+  best_weights :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs\rtdetr_l_kitti_03\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir      :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj
+  batch         :  8
+  conf          :  0.3
+  cos_lr        :  False
+  device        :  cuda
+  epochs        :  20
+  eval_only     :  True
+  eval_test     :  True
+  eval_test_dir :  datasets\kitti\images\test
+  eval_weights  :  runs\rtdetr_l_kitti_03\weights\best.pt
+  freeze        :  0
+  imgsz         :  640
+  log_path      :  log\rt-detr-l.txt
+  lr0           :  0.0001
+  lrf           :  0.01
+  optimizer     :  auto
+  plot_curves   :  True
+  plot_dpi      :  150
+  predict_name  :  rtdetr_predict_imgs
+  project_dir   :  
+  resume        :  False
+  resume_ckpt   :  
+  run_name      :  rtdetr_l_kitti_03
+  sample_k      :  20
+  warmup_epochs :  3.0
+  weights       :  rtdetr-l.pt
+  workers       :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.916      0.895      0.923      0.652
+            Pedestrian        289        679      0.904      0.866      0.892      0.561
+               Cyclist        177        263      0.928      0.924      0.954      0.743
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-08 12:20:56
+  duration     :  0:01:05.935687
+  end_time     :  2026-06-08 12:22:01
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs
+  run_name     :  rtdetr_l_kitti_rain_heavy
+  best_weights :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs\rtdetr_l_kitti_03\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir      :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj
+  batch         :  8
+  conf          :  0.3
+  cos_lr        :  False
+  device        :  cuda
+  epochs        :  20
+  eval_only     :  True
+  eval_test     :  True
+  eval_test_dir :  datasets\kitti\images\test
+  eval_weights  :  runs\rtdetr_l_kitti_03\weights\best.pt
+  freeze        :  0
+  imgsz         :  640
+  log_path      :  log\rt-detr-l.txt
+  lr0           :  0.0001
+  lrf           :  0.01
+  optimizer     :  auto
+  plot_curves   :  True
+  plot_dpi      :  150
+  predict_name  :  rtdetr_predict_imgs
+  project_dir   :  
+  resume        :  False
+  resume_ckpt   :  
+  run_name      :  rtdetr_l_kitti_rain_heavy
+  sample_k      :  20
+  warmup_epochs :  3.0
+  weights       :  rtdetr-l.pt
+  workers       :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.916      0.831      0.883      0.592
+            Pedestrian        289        679      0.879      0.803      0.846      0.514
+               Cyclist        177        263      0.954      0.859       0.92      0.669
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-08 12:47:56
+  duration     :  0:00:49.823698
+  end_time     :  2026-06-08 12:48:46
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs
+  run_name     :  rtdetr_l_kitti_fog
+  best_weights :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs\rtdetr_l_kitti_03\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir      :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj
+  batch         :  8
+  conf          :  0.3
+  cos_lr        :  False
+  device        :  cuda
+  epochs        :  20
+  eval_only     :  True
+  eval_test     :  True
+  eval_test_dir :  datasets\kitti\images\test
+  eval_weights  :  runs\rtdetr_l_kitti_03\weights\best.pt
+  freeze        :  0
+  imgsz         :  640
+  log_path      :  log\rt-detr-l.txt
+  lr0           :  0.0001
+  lrf           :  0.01
+  optimizer     :  auto
+  plot_curves   :  True
+  plot_dpi      :  150
+  predict_name  :  rtdetr_predict_imgs
+  project_dir   :  
+  resume        :  False
+  resume_ckpt   :  
+  run_name      :  rtdetr_l_kitti_fog
+  sample_k      :  20
+  warmup_epochs :  3.0
+  weights       :  rtdetr-l.pt
+  workers       :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.903       0.67      0.736      0.487
+            Pedestrian        289        679      0.892      0.602      0.667       0.39
+               Cyclist        177        263      0.915      0.738      0.805      0.583
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-08 12:50:50
+  duration     :  0:00:47.524540
+  end_time     :  2026-06-08 12:51:37
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs
+  run_name     :  rtdetr_l_kitti_frost
+  best_weights :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs\rtdetr_l_kitti_03\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir      :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj
+  batch         :  8
+  conf          :  0.3
+  cos_lr        :  False
+  device        :  cuda
+  epochs        :  20
+  eval_only     :  True
+  eval_test     :  True
+  eval_test_dir :  datasets\kitti\images\test
+  eval_weights  :  runs\rtdetr_l_kitti_03\weights\best.pt
+  freeze        :  0
+  imgsz         :  640
+  log_path      :  log\rt-detr-l.txt
+  lr0           :  0.0001
+  lrf           :  0.01
+  optimizer     :  auto
+  plot_curves   :  True
+  plot_dpi      :  150
+  predict_name  :  rtdetr_predict_imgs
+  project_dir   :  
+  resume        :  False
+  resume_ckpt   :  
+  run_name      :  rtdetr_l_kitti_frost
+  sample_k      :  20
+  warmup_epochs :  3.0
+  weights       :  rtdetr-l.pt
+  workers       :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942       0.82      0.339      0.395      0.237
+            Pedestrian        289        679      0.819       0.34      0.408      0.225
+               Cyclist        177        263       0.82      0.338      0.382      0.249
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-08 12:52:51
+  duration     :  0:00:47.192183
+  end_time     :  2026-06-08 12:53:38
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs
+  run_name     :  rtdetr_l_kitti_snow
+  best_weights :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs\rtdetr_l_kitti_03\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir      :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj
+  batch         :  8
+  conf          :  0.3
+  cos_lr        :  False
+  device        :  cuda
+  epochs        :  20
+  eval_only     :  True
+  eval_test     :  True
+  eval_test_dir :  datasets\kitti\images\test
+  eval_weights  :  runs\rtdetr_l_kitti_03\weights\best.pt
+  freeze        :  0
+  imgsz         :  640
+  log_path      :  log\rt-detr-l.txt
+  lr0           :  0.0001
+  lrf           :  0.01
+  optimizer     :  auto
+  plot_curves   :  True
+  plot_dpi      :  150
+  predict_name  :  rtdetr_predict_imgs
+  project_dir   :  
+  resume        :  False
+  resume_ckpt   :  
+  run_name      :  rtdetr_l_kitti_snow
+  sample_k      :  20
+  warmup_epochs :  3.0
+  weights       :  rtdetr-l.pt
+  workers       :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.788      0.335      0.376      0.219
+            Pedestrian        289        679      0.791      0.362      0.402      0.219
+               Cyclist        177        263      0.786      0.307      0.349      0.219
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-06-11 18:54:24
+  duration     :  0:00:58.100882
+  end_time     :  2026-06-11 18:55:22
+  dataset_yaml :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\Src\Train\kitti.yaml
+  dataset_root :  C:\Users\23978\Desktop\大三课程（设计）\智能汽车技术\Smart_Car_Proj\datasets\kitti
+  project_dir  :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs
+  run_name     :  rtdetr_l_dark
+  best_weights :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj\runs\rtdetr_l_kitti_03\weights\best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir      :  C:\\Users\\23978\\Desktop\\大三课程（设计）\\智能汽车技术\\Smart_Car_Proj
+  batch         :  8
+  conf          :  0.3
+  cos_lr        :  False
+  data          :  Src/Train/kitti.yaml
+  device        :  cuda
+  epochs        :  20
+  eval_only     :  True
+  eval_test     :  True
+  eval_test_dir :  datasets\kitti\images\test
+  eval_weights  :  runs\rtdetr_l_kitti_03\weights\best.pt
+  freeze        :  0
+  imgsz         :  640
+  log_path      :  log\rt-detr-l.txt
+  lr0           :  0.0001
+  lrf           :  0.01
+  optimizer     :  auto
+  plot_curves   :  True
+  plot_dpi      :  150
+  predict_name  :  rtdetr_predict_imgs
+  project_dir   :  
+  resume        :  False
+  resume_ckpt   :  
+  run_name      :  rtdetr_l_dark
+  sample_k      :  20
+  warmup_epochs :  3.0
+  weights       :  rtdetr-l.pt
+  workers       :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942        0.9      0.767      0.835      0.562
+            Pedestrian        289        679       0.88      0.755      0.814      0.488
+               Cyclist        177        263       0.92      0.779      0.855      0.636
+============================================================================================

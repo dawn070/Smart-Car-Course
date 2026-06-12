@@ -108,7 +108,7 @@ def _get_transform(corruption_name: str, severity: int, **kwargs) -> A.Compose:
         )
     elif corruption_name == "brightness":
         transforms.append(
-            A.RandomBrightnessContrast(brightness_limit=(-0.2 * alpha, 0.2 * alpha), contrast_limit=0, p=1.0)
+            A.RandomBrightnessContrast(brightness_limit=(-0.3 * alpha, 0), contrast_limit=0, p=1.0)
         )
     elif corruption_name == "contrast":
         transforms.append(

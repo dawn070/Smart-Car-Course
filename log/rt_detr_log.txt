@@ -1,0 +1,90 @@
+============================================================================================
+Run Meta:
+  start_time   :  2026-05-30 17:38:07
+  duration     :  3:35:01.715549
+  end_time     :  2026-05-30 21:13:09
+  dataset_yaml :  /mnt/project/liqiming/Smart_Car/Src/Train/kitti.yaml
+  dataset_root :  /mnt/project/liqiming/Smart_Car/datasets/kitti
+  project_dir  :  /mnt/project/liqiming/Smart_Car/runs
+  run_name     :  rtdetr_kitti_baseline
+  best_weights :  /mnt/project/liqiming/Smart_Car/runs/rtdetr_kitti_baseline/weights/best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir      :  /mnt/project/liqiming/Smart_Car
+  batch         :  32
+  conf          :  0.3
+  cos_lr        :  True
+  device        :  cuda
+  epochs        :  100
+  eval_test     :  True
+  freeze        :  5
+  imgsz         :  640
+  log_path      :  log/rt_detr_log.txt
+  lr0           :  0.0001
+  lrf           :  0.01
+  optimizer     :  auto
+  plot_curves   :  True
+  plot_dpi      :  150
+  predict_name  :  rtdetr_predict_imgs
+  project_dir   :  
+  resume        :  False
+  resume_ckpt   :  
+  run_name      :  rtdetr_kitti_baseline
+  sample_k      :  10
+  warmup_epochs :  5.0
+  weights       :  rtdetr-l.pt
+  workers       :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.925      0.875      0.918      0.637
+            Pedestrian        289        679      0.905      0.845      0.894      0.558
+               Cyclist        177        263      0.944      0.905      0.942      0.717
+============================================================================================
+============================================================================================
+Run Meta:
+  start_time   :  2026-05-31 09:31:52
+  duration     :  3:47:01.149802
+  end_time     :  2026-05-31 13:18:53
+  dataset_yaml :  /mnt/project/liqiming/Smart_Car/Src/Train/kitti.yaml
+  dataset_root :  /mnt/project/liqiming/Smart_Car/datasets/kitti
+  project_dir  :  /mnt/project/liqiming/Smart_Car/runs
+  run_name     :  rtdetr_kitti_baseline_2
+  best_weights :  /mnt/project/liqiming/Smart_Car/runs/rtdetr_kitti_baseline_2/weights/best.pt
+Split Counts:
+  train : images=1200  instances=2980   missing_labels=0
+  val   : images=400   instances=1015   missing_labels=0
+  test  : images=400   instances=942    missing_labels=0
+Hyperparameters:
+  base_dir      :  /mnt/project/liqiming/Smart_Car
+  batch         :  16
+  conf          :  0.3
+  cos_lr        :  True
+  device        :  cuda
+  epochs        :  100
+  eval_test     :  True
+  freeze        :  3
+  imgsz         :  640
+  log_path      :  log/rt_detr_log.txt
+  lr0           :  0.0001
+  lrf           :  0.01
+  optimizer     :  auto
+  plot_curves   :  True
+  plot_dpi      :  150
+  predict_name  :  rtdetr_predict_imgs
+  project_dir   :  
+  resume        :  False
+  resume_ckpt   :  
+  run_name      :  rtdetr_kitti_baseline_2
+  sample_k      :  10
+  warmup_epochs :  5.0
+  weights       :  rtdetr-l.pt
+  workers       :  0
+Test Metrics:
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+                   all        400        942      0.923      0.862      0.919      0.637
+            Pedestrian        289        679      0.899      0.826      0.886      0.552
+               Cyclist        177        263      0.946      0.897      0.951      0.722
+============================================================================================

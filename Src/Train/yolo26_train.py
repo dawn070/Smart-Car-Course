@@ -164,6 +164,12 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 		default="",
 		help="eval-only 模式下测试集目录（覆盖 yaml 中的 test 路径，支持绝对或相对 base-dir 的路径）",
 	)
+	parser.add_argument(
+		"--data",
+		type=str,
+		default="Src/Train/kitti.yaml",
+		help="数据集配置文件（.yaml），支持绝对路径或相对 base-dir 的相对路径",
+	)
 	return parser
 
 
@@ -178,7 +184,8 @@ def main():
 
 	# 切换到项目根目录并使用相对路径，避免 YOLO 底层对中文路径解析出错
 	os.chdir(base_dir)
-	yaml_rel_path = os.path.join("Src", "Train", "kitti.yaml")
+	data_arg = args.data.strip()
+	yaml_rel_path = data_arg if os.path.isabs(data_arg) else os.path.join(base_dir, data_arg)
 
 	dataset_info = collect_dataset_info(base_dir, yaml_rel_path)
 
