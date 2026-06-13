@@ -2,6 +2,7 @@ from ultralytics import YOLO
 import os
 import glob
 import random
+import types
 from typing import Optional
 import argparse
 from datetime import datetime
@@ -14,6 +15,7 @@ from train_log_utils import (
 )
 
 from plot_training_curves import plot_2x2_from_results_csv
+from degradation import apply_random_degradation
 
 
 random.seed(42)
@@ -170,6 +172,12 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 		default="Src/Train/kitti.yaml",
 		help="数据集配置文件（.yaml），支持绝对路径或相对 base-dir 的相对路径",
 	)
+	parser.add_argument(
+		"--corrupt",
+		action="store_true",
+		default=False,
+		help="启用随机天气退化增强（仅训练集，30% 概率：snow 8%, frost 8%, fog 8%, rain 3%, brightness 3%，强度=3）",
+	)
 	return parser
 
 
@@ -245,6 +253,26 @@ def main():
 		# ========== 正常训练模式 ==========
 		print("\n=== 2. 开始在 KITTI 数据集上进行微调 (Fine-tune) ===")
 
+		if args.corrupt:
+			import ultralytics.data.build as _build_mod
+			_orig_build = _build_mod.build_yolo_dataset
+
+			def _patched_build(cfg, img_path, batch, data, mode="train", rect=False,
+							   stride=32, multi_modal=False):
+				dataset = _orig_build(cfg, img_path, batch, data, mode=mode,
+									  rect=rect, stride=stride, multi_modal=multi_modal)
+				if mode == "train":
+					_orig_get = dataset.get_image_and_label
+					def _corrupt_get(self, index, *, _orig=_orig_get):
+						result = _orig(index)
+						result["img"] = apply_random_degradation(result["img"])
+						return result
+					dataset.get_image_and_label = types.MethodType(_corrupt_get, dataset)
+				return dataset
+
+			_build_mod.build_yolo_dataset = _patched_build
+			print("[degradation] 已启用随机天气退化增强（训练集 30%）。")
+
 		model.train(
 			data=yaml_rel_path,
 			epochs=args.epochs,
@@ -304,6 +332,7 @@ def main():
 		metrics = best_model.val(
 			data=eval_data_yaml,
 			split="test",
+			imgsz=args.imgsz,
 			project=project_dir,
 			name=os.path.join(run_name, "test_eval"),
 			exist_ok=True,
@@ -329,6 +358,7 @@ def main():
 
 	best_model.predict(
 		source=sample_imgs,
+		imgsz=args.imgsz,
 		save=True,          # 在图片上画框并保存
 		conf=args.conf,          # 置信度阈值
 		project=project_dir,
